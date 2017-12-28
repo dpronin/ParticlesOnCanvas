@@ -14,7 +14,6 @@ function Particle(x, y, random) {
     x: x,
     y: y,
     r: 2,
-    color: '#000',
     distanceTraveled: 0,
     alive: true
   }
@@ -59,8 +58,8 @@ function Particle(x, y, random) {
   this.blow = function() {
     if (particles.length < MAX_COUNT / 5) {
       for (let i = 0; i < this.r / 3; i++) {
-        let x = this.x - (Math.random() - 0.5) * 100 - this.r * (Math.floor(Math.random() * 10 + 1) % 2 == 1 ? 1 : -1);
-        let y = this.y - (Math.random() - 0.5) * 100 - this.r * (Math.floor(Math.random() * 10 + 1) % 2 == 1 ? 1 : -1);
+        let x = this.x - (Math.random() - 0.5) * 100 - this.r * getPositiveOrNegative();
+        let y = this.y - (Math.random() - 0.5) * 100 - this.r * getPositiveOrNegative();
         addParticleAt(x, y, true);
       }
     }
@@ -71,20 +70,19 @@ function Particle(x, y, random) {
     if (this.r > MAX_SIZE) {
       this.blow();
     } else {
-      this.y += SPEED * (Math.floor(Math.random() * 10 + 1) % 2 == 1 ? 1 : -1); 
-      this.x += SPEED * (Math.floor(Math.random() * 10 + 1) % 2 == 1 ? 1 : -1);
+      this.y += SPEED * getPositiveOrNegative(); 
+      this.x += SPEED * getPositiveOrNegative();
       this.distanceTraveled += 1;
     }
   }
 
   this.draw = function() {
     this.opacity = (MAX_SIZE / this.r) / 10;
-    // console.log(this.opacity);
     context.beginPath();
     context.arc(this.x, this.y, this.r, 0, Math.PI * 2, true);
     context.fillStyle = 'rgba(0, 0, 0, ' + this.opacity + ')';
     context.fill();
-    context.stroke();
+    // context.stroke();
     context.closePath();
   }
 
@@ -99,13 +97,7 @@ function Particle(x, y, random) {
       this.distanceTraveled = 0;
     }
   }
-  
-  this.checkIsOutOfCanvas = function() {
-    if (this.x > width && this.y > heigth) {
-      this.kill();
-    }
-  }
-  
+    
   this.isAlive = function() {
     return this.alive;
   }
@@ -116,10 +108,21 @@ function Particle(x, y, random) {
   
 }
 
+getPositiveOrNegative = () => {
+  return Math.floor(Math.random() * 10 + 1) % 2 == 1 ? 1 : -1;
+}
+
+checkIsOutOfCanvas = function(particle) {
+  if (particle.x > width && particle.y > height) {
+    particle.kill();
+  }
+}
+
 function update() {
   context.globalCompositeOperation = "source-over";
   context.clearRect(0, 0, width, height);
   particles.forEach(particle => {
+    checkIsOutOfCanvas(particle);
     particle.move();
     particle.draw();
     particles.forEach(neighbor => {
@@ -134,13 +137,7 @@ function update() {
       }
     })
   });
-  newParticles = []
-  particles.forEach(e => {
-    if (e.isAlive()) {
-      newParticles.push(e);
-    }
-  });
-  particles = newParticles;
+  particles = particles.filter(e => e.isAlive());
   requestAnimationFrame(update);
 }
 
