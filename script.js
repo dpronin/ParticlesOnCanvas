@@ -26,10 +26,12 @@ window.onload = function(){
           this.r = Math.floor(Math.random() * 5) + 1;
           this.distanceTraveled = this.settings.distanceTraveled;
           this.color = {r: Math.random()*256|0, g: Math.random()*256|0, b: Math.random()*256|0};
+          this.direction = getPositiveOrNegative();
+          this.angle = 0;
           this.alive = true,
           this.target = undefined,
           this.opacity = 1,
-          this.actions = [this.walk];
+          this.actions = getPositiveOrNegative() === 1 ? [this.walk] : [this.wiggle] ;
         }
 
         this.eat = function(particle) {
@@ -40,6 +42,15 @@ window.onload = function(){
           particle.kill();
         }
 
+        this.wiggle = function() {
+          var dx = Math.cos(this.angle * Math.PI / 180) * this.r;
+          var dy = Math.sin(this.angle * Math.PI / 180) * this.r;
+          this.angle += this.r;
+          this.x += dx ;
+          this.y += dy * this.direction;
+          this.distanceTraveled += 3;
+        }
+        
         this.hunt = function() {
           deltaX = this.x - this.target.clientX; 
           deltaY = this.target.clientY - this.y;
