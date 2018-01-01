@@ -5,7 +5,7 @@ window.onload = function(){
             MAX_SIZE = 50,
             MAX_COUNT = 1000,
             MAX_DISTANCE_TRAVLED = 20,
-            COUNT = 1000;
+            COUNT = 100;
 
       let   width = 0,
             height = 0,
@@ -33,7 +33,7 @@ window.onload = function(){
         }
 
         this.eat = function(particle) {
-          this.r = Math.max(particle.r / Math.PI / 2, MAX_SIZE);
+          this.r += 2;
           if (this.r > MAX_SIZE) {
             this.blow();
           }
@@ -46,7 +46,6 @@ window.onload = function(){
           let angle = Math.atan2(deltaY, deltaX) * (180 / Math.PI);
           this.y += SPEED * Math.cos(angle) * -1; 
           this.x += SPEED * Math.sin(angle) * -1;
-          this.distanceTraveled += 1;
           if (Math.sqrt( deltaX * deltaX + deltaY * deltaY ) < 10) {
             this.actions.pop();
           }
@@ -69,13 +68,8 @@ window.onload = function(){
         }
 
         this.walk = function() {
-          if (this.r > MAX_SIZE) {
-            this.blow();
-          } else {
-            this.y += SPEED * getPositiveOrNegative(); 
-            this.x += SPEED * getPositiveOrNegative();
-            this.distanceTraveled += 1;
-          }
+          this.y += SPEED * getPositiveOrNegative(); 
+          this.x += SPEED * getPositiveOrNegative();
         }
 
         this.draw = function() {
@@ -93,6 +87,10 @@ window.onload = function(){
           }
           let a = this.actions[this.actions.length - 1];
           a.call(this);
+          if (this.r > MAX_SIZE) {
+            this.blow();
+          }
+          this.distanceTraveled += 1;
           if (this.distanceTraveled > MAX_DISTANCE_TRAVLED) {
             this.r += Math.random();
             this.distanceTraveled = 0;
