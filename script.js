@@ -2,10 +2,10 @@ window.onload = function(){
       const canvas = document.getElementById('canvas'),
             context = canvas.getContext('2d'),
             SPEED = 0.6,
-            MAX_SIZE = 30,
+            MAX_SIZE = 50,
             MAX_COUNT = 1000,
             MAX_DISTANCE_TRAVLED = 20,
-            COUNT = 100;
+            COUNT = 1000;
 
       let   width = 0,
             height = 0,
@@ -25,7 +25,7 @@ window.onload = function(){
           this.y = random ? this.settings.y : Math.floor(Math.random() * height); 
           this.r = Math.floor(Math.random() * 5) + 1;
           this.distanceTraveled = this.settings.distanceTraveled;
-          this.color = this.settings.color;
+          this.color = {r: Math.random()*256|0, g: Math.random()*256|0, b: Math.random()*256|0};
           this.alive = true,
           this.target = undefined,
           this.opacity = 1,
@@ -33,7 +33,7 @@ window.onload = function(){
         }
 
         this.eat = function(particle) {
-          this.r = Math.max(particle.r / Math.PI, MAX_SIZE);
+          this.r = Math.max(particle.r / Math.PI / 2, MAX_SIZE);
           if (this.r > MAX_SIZE) {
             this.blow();
           }
@@ -79,10 +79,10 @@ window.onload = function(){
         }
 
         this.draw = function() {
-          this.opacity = (MAX_SIZE / this.r) / 10;
+          this.opacity = (MAX_SIZE / this.r) / 20;
           context.beginPath();
           context.arc(this.x, this.y, this.r, 0, Math.PI * 2, true);
-          context.fillStyle = 'rgba(0, 0, 0, ' + this.opacity + ')';
+          context.fillStyle = getColor(this.color.r, this.color.g, this.color.b, this.opacity);
           context.fill();
           context.closePath();
         }
@@ -113,8 +113,12 @@ window.onload = function(){
         return Math.floor(Math.random() * 10 + 1) % 2 == 1 ? 1 : -1;
       }
 
+      getColor = (r, g, b, opacity) => {
+        return 'rgba(' + r + ', ' + g + ', ' + b + ', ' + opacity + ')';
+      }
+
       checkIsOutOfCanvas = function(particle) {
-        if (particle.x > width && particle.y > height) {
+        if (particle.x > width || particle.y > height || particle.x < 0 || particle.y < 0) {
           particle.kill();
         }
       }
